@@ -52,7 +52,7 @@ const Graph = () => {
   };
 
   return (
-    <div style={{ height: "80vh", width: "100vw" }}>
+    <div style={{ height: "80vh", width: "96vw" }}>
       <ReactFlow
         elements={elements}
         nodesDraggable={false}

@@ -8,35 +8,57 @@ const Table = (props) => {
 
   const dataRows = React.useMemo(() => {
     if (data && data.length > 1) {
-      return data.slice(0, 5).map((row) => {
+      const tableData = data.slice(1, 6).map((row) => {
         const rowData = {};
         row.forEach((item, index) => {
           rowData[index.toString()] = item;
         });
         return rowData;
       });
+      return tableData;
     }
     return [];
   }, [data]);
 
   const columns = React.useMemo(() => {
     if (data && data.length > 0) {
-      return data[0].slice(0, displayedColumns).map((item, index) => {
-        return {
-          Header: item,
-          accessor: index.toString(),
-        };
+      const columnsData = data[0]
+        .slice(0, displayedColumns)
+        .map((item, index) => {
+          return {
+            Header: item,
+            accessor: index.toString(),
+          };
+        });
+      let columnsLeft = data[0].length - displayedColumns;
+      columnsLeft = columnsLeft >= 0 ? columnsLeft : 0;
+      columnsData.push({
+        Header: `Columns left: ${columnsLeft}`,
+        accessor: "",
       });
+      return columnsData;
     }
     return [];
   }, [data]);
 
   const tableInstance = useTable({ columns, data: dataRows });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    footerGroups,
+    rows,
+    prepareRow,
+  } = tableInstance;
 
   return (
-    <table {...getTableProps()}>
+    <table
+      className="table"
+      {...getTableProps()}
+      border="0"
+      cellspacing="0"
+      cellpadding="0"
+    >
       <thead className="table__header">
         {
           // Loop over the header rows
@@ -70,13 +92,13 @@ const Table = (props) => {
             prepareRow(row);
             return (
               // Apply the row props
-              <tr {...row.getRowProps()}>
+              <tr className="table__bodyrow" {...row.getRowProps()}>
                 {
                   // Loop over the rows cells
                   row.cells.map((cell) => {
                     // Apply the cell props
                     return (
-                      <td {...cell.getCellProps()}>
+                      <td className="table__bodycell" {...cell.getCellProps()}>
                         {
                           // Render the cell contents
                           cell.render("Cell")
@@ -90,6 +112,18 @@ const Table = (props) => {
           })
         }
       </tbody>
+      <tfoot>
+        {footerGroups.map((group) => (
+          <tr {...group.getFooterGroupProps()}>
+            {group.headers.map((column) => (
+              <td {...column.getFooterProps()}>{column.render("Footer")}</td>
+            ))}
+          </tr>
+        ))}
+        <tr>
+          <td>Rows: {data?.length - 1 || 0}</td>
+        </tr>
+      </tfoot>
     </table>
   );
 };
